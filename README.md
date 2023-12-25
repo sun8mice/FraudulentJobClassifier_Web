@@ -1,1 +1,2 @@
 # FraudulentJobClassifier_Web
+一个基于Flask的Web应用，用以检测虚假招聘信息
