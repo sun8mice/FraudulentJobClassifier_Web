@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>虚假招聘信息检测信息系统</title>
+    <script>
+        function submitData() {
+            var inputText = document.getElementById("input-text").value;
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/predict", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var response = JSON.parse(xhr.responseText);
+                    document.getElementById("processed-text").value = response.processed_text;
+                    document.getElementById("prediction-result").value = response.result;
+                }
+            };
+            var data = JSON.stringify({"text": inputText});
+            xhr.send(data);
+        }
+
+        function resetData() {
+        document.getElementById("input-text").value = '';
+        document.getElementById("processed-text").value = '';
+        document.getElementById("prediction-result").value = '';
+        }
+    </script>
+</head>
+<body>
+    <h1 style="text-align: center;">基于Flask搭建的虚假招聘信息检测信息系统</h1>
+    <div id="upload-section">
+        <h2>上传数据</h2>
+        <textarea id="input-text" rows="4" cols="50"></textarea>
+        <button onclick="submitData()">提交</button>
+    </div>
+    <div id="prediction-section">
+        <h2>模型预测结果</h2>
+        <textarea id="processed-text" rows="4" cols="50"></textarea>
+        <textarea id="prediction-result" rows="4" cols="50"></textarea>
+        <button onclick="resetData()">重置</button>
+    </div>
+    
+    <div id="visualization-section">
+        <!-- 可视化区块 -->
+    </div>
+</body>
+</html>

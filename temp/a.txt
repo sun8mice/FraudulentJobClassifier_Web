@@ -1,0 +1,9 @@
+FJC_WEB/
+  - app.py
+  - templates/
+    - index.html
+    - base.html
+  - static/
+    - css/
+      - style.css
+  - rawdata/

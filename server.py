@@ -1,15 +1,27 @@
-from flask import Flask
+from flask import Flask, render_template, request, jsonify
+import os
+import sys
 
-#用当前脚本名称实例化Flask对象，方便flask从该脚本文件中获取需要的内容
+sys.path.insert(0, os.path.dirname(__file__))
+
+import datapreprocess
+
 app = Flask(__name__)
 
-#程序实例需要知道每个url请求所对应的运行代码是谁。
-#所以程序中必须要创建一个url请求地址到python运行函数的一个映射。
-#处理url和视图函数之间的关系的程序就是"路由"，在Flask中，路由是通过@app.route装饰器(以@开头)来表示的
-#methods参数用于指定允许的请求格式
-#常规输入url的访问就是get方法
 @app.route('/')
-def hello_world():
-    return 'Hello, World!'
+def index():
+    return render_template('index.html')
 
-app.run()
+@app.route('/predict', methods=['POST'])
+def predict():
+    text = request.json['text']
+    processed_text = datapreprocess.preprocess(text) # 调用datapreprocess.py中的函数处理文本
+    
+    # 在这里调用模型进行预测
+    # prediction_result = model.predict(processed_text)  # 这里需要替换为实际的模型预测代码
+    prediction_result = "前方应出现文本预处理的结果" #前期测试用
+
+    return jsonify({'processed_text': processed_text, 'result': prediction_result})
+
+if __name__ == '__main__':
+    app.run(debug=True)
