@@ -1,5 +1,6 @@
 import jieba
 import pandas as pd
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 def preprocess(text):
     # 加载停用词表
@@ -13,3 +14,6 @@ def preprocess(text):
     # 返回处理后的分词结果
     return ' '.join(filtered_words) 
 
+def vectorizer(text):
+    vectorizer = TfidfVectorizer()
+    return vectorizer.fit_transform(text)
