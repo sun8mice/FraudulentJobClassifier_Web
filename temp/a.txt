@@ -4,6 +4,6 @@ FJC_WEB/
     - index.html
     - base.html
   - static/
-    - css/
-      - style.css
+    - model/
+      - model.pkl
   - rawdata/

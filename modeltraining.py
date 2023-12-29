@@ -1,30 +1,47 @@
 import pandas as pd
-import jieba
-# 导入情感分析所需的库
-from sklearn.model_selection import train_test_split
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.naive_bayes import MultinomialNB
-from sklearn.metrics import accuracy_score, classification_report
-import datapreprocess
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.neural_network import MLPClassifier
 import joblib
+# import datapreprocess
+import jieba
 
-# 导入数据集
-data = pd.read_csv('./temp/item_comments.csv')
+#读取数据，映射标签
+df = pd.read_csv("temp/item_comments.csv")
+df["label"] = df["label"].map({"正面": 1, "负面": 0})
 
-# 对text列进行分词和停用词过滤
-data['evaluation'] = data['evaluation'].apply(datapreprocess.preprocess)
+#分词，剔除停用词
+words= []
+for i,row in  df.iterrows():
+    word = jieba.cut(row['evaluation'])
+    result = '  '.join(word)
+    words.append(result)
 
-# 划分训练集和测试集
-X = data['evaluation']  # 特征
-y = data['label']  # 标签
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+#向量化
+vect = CountVectorizer() #将文本转换为数值，构成特征向量
+X = vect.fit_transform(words)
+X = X.toarray()
+y = df['label']
 
-# 特征提取
-X_train_vec = datapreprocess.vectorizer(X_train)
-X_test_vec = datapreprocess.vectorizer(X_test)
+#划分训练集测试集
+X_train,X_test,y_train,y_test = train_test_split(X,y,test_size = 0.1,random_state = 1)
 
-# 建立模型
-model = MultinomialNB()
-model.fit(X_train_vec, y_train)
+from sklearn.neural_network import MLPClassifier
+mlp = MLPClassifier()
+mlp.fit(X_train,y_train)
 
-joblib.dump(model, './static/model/model.pkl')
+# y_pred = mlp.predict(X_test)
+# from sklearn.metrics import accuracy_score
+# score = accuracy_score(y_pred,y_test)
+# print(score)
+
+# comment = input("请输入你对商品的评价：")
+# comment = datapreprocess.preprocess(comment)
+# print(comment)
+# X_try = vect.transform(comment)
+# y_pred = mlp.predict(X_try.toarray())
+# print(y_pred)
+
+# 导出模型和向量化器
+joblib.dump(mlp, 'static/model/mlp_model.pkl')
+joblib.dump(vect, 'static/vectorizer/count_vect.pkl')
