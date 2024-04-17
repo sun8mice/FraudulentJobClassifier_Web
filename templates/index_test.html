@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">    
+    <title>虚假招聘信息检测信息系统</title>
+     
+    <!-- AdminLTE CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/adminlte.min.css') }}">
+    <!-- Your custom styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <!-- iCheck -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}">
+    <!-- JQVMap -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='plugins/jqvmap/jqvmap.min.css') }}">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='dist/css/adminlte.min.css') }}">
+
+    <script>
+        function submitData() {
+            var inputText = document.getElementById("input-text").value;
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/predict", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var response = JSON.parse(xhr.responseText);
+                    document.getElementById("prediction-result").value = response.result;
+                }
+            };
+            var data = JSON.stringify({"text": inputText});
+            xhr.send(data);
+        }
+
+        function resetData() {
+        document.getElementById("input-text").value = '';
+        document.getElementById("prediction-result").value = '';
+        }
+    </script>
+</head>
+<body class="hold-transition layout-top-nav">
+      <!-- Navbar -->
+      <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+        <h1 class="m-0">基于Flask搭建的虚假招聘信息检测信息系统</h1>
+        <!-- Right navbar links -->
+        <ul class="navbar-nav ml-auto">  
+      </nav>
+      <!-- /.navbar -->
+
+<body class="hold-transition layout-top-nav">
+            <!-- 测试用 -->
+            <!-- <div id="upload-section">
+                <h2>上传数据</h2>
+                <textarea id="input-text" rows="4" cols="50"></textarea>
+                <button onclick="submitData()">提交</button>
+            </div>
+            <div id="prediction-section">
+                <h2>模型预测结果</h2>
+                <textarea id="prediction-result" rows="4" cols="50"></textarea>
+                <button onclick="resetData()">重置</button>
+            </div> -->
+
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+            <!-- Content Header (Page header) -->
+            <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                    <h1 class="m-0">功能模块
+                    </h1>
+                </div><!-- /.row -->
+                </div><!-- /.container-fluid -->
+            <!-- /.content-header -->
+            
+            <!-- Main content -->
+            <section class="content">
+                <div class="container-fluid">
+                    <!-- Your content goes here 此处是所有组件容器-->
+                    <!-- Small boxes (Stat box)可视化卡牌框 -->
+                    <div class="row">
+                    <div class="col-lg-3 col-6">
+
+                        <!-- small box -->
+                        <div class="small-box bg-info">
+                            <div class="inner">
+                            <h3>150</h3>
+                            <p>检测数量</p>
+                            </div>
+                        </div>
+                        </div>
+                        <!-- ./col -->
+                        <div class="col-lg-3 col-6">
+
+                        <!-- small box -->
+                        <div class="small-box bg-success">
+                            <div class="inner">
+                            <h3>53<sup style="font-size: 20px">%</sup></h3>
+                            <p>虚假招聘信息比例</p>
+                            </div>
+                        </div>
+                        </div>
+                        <!-- ./col -->
+                        <div class="col-lg-3 col-6">
+                    <!-- DIRECT CHAT核心功能：检测招聘信息 -->
+                    <div class="card direct-chat direct-chat-primary">
+                        <div class="card-header">
+                          <h3 class="card-title">招聘信息检测</h3>
+                        </div>
+                        <!-- /.card-header -->
+                        <div class="card-body">
+                            <!-- Conversations are loaded here -->
+                            <div class="direct-chat-messages">
+                            <!-- Message. Default to the left -->
+                            <div class="direct-chat-msg">
+                                <div class="direct-chat-infos clearfix">
+                                <span class="direct-chat-name float-left">Alexander Pierce</span>
+                                <span class="direct-chat-timestamp float-right">23 Jan 2:00 pm</span>
+                                </div>
+                                <!-- /.direct-chat-infos -->
+                                <img class="direct-chat-img" src="dist/img/user1-128x128.jpg" alt="message user image">
+                                <!-- /.direct-chat-img -->
+                                <div class="direct-chat-text">
+                                Is this template really for free? That's unbelievable!
+                                </div>
+                                <!-- /.direct-chat-text -->
+                            </div>
+                            <!-- /.direct-chat-msg -->
+            
+                            <!-- Message to the right -->
+                            <div class="direct-chat-msg right">
+                                <div class="direct-chat-infos clearfix">
+                                <span class="direct-chat-name float-right">Sarah Bullock</span>
+                                <span class="direct-chat-timestamp float-left">23 Jan 2:05 pm</span>
+                                </div>
+                                <!-- /.direct-chat-infos -->
+                                <img class="direct-chat-img" src="dist/img/user3-128x128.jpg" alt="message user image">
+                                <!-- /.direct-chat-img -->
+                                <div class="direct-chat-text">
+                                You better believe it!
+                                </div>
+                                <!-- /.direct-chat-text -->
+                            </div>
+                            <!-- /.direct-chat-msg -->
+                            
+                        <div class="card-footer">
+                            <form action="#" method="post">
+                            <div class="input-group">
+                                <input type="text" name="message" placeholder="Type Message ..." class="form-control">
+                                <span class="input-group-append">
+                                <button type="button" class="btn btn-primary">Send</button>
+                                </span>
+                            </div>
+                            </form>
+                        </div>
+                        <!-- /.card-footer-->
+                        </div>
+                        <!--/.direct-chat -->
+                </div>
+                <!-- DONUT CHART可视化功能，环状图 -->
+                <div class="card card-danger">
+                    <div class="card-header">
+                    <h3 class="card-title">数据集诈骗信息比例</h3>
+                    </div>
+                    <div class="card-body">
+                    <canvas id="donutChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+
+
+
+
+            </section>
+            <!-- /.content -->
+        </div>
+        <!-- /.content-wrapper        -->
+
+    <!-- ChartJS -->
+    <script src="/static/plugins/chart.js/Chart.min.js"></script>
+    <!-- AdminLTE App -->
+    <script src="/static/dist/js/adminlte.min.js"></script>
+    <script>
+        $(function () {
+          /* ChartJS
+           * -------
+           * Here we will create a few charts using ChartJS
+           */
+      
+          //-------------
+          //- DONUT CHART -
+          //-------------
+          // Get context with jQuery - using jQuery's .get() method.
+          var donutChartCanvas = $('#donutChart').get(0).getContext('2d')
+          var donutData        = {
+            labels: [
+                'Chrome',
+                'IE',
+                'FireFox',
+                'Safari',
+                'Opera',
+                'Navigator',
+            ],
+            datasets: [
+              {
+                data: [700,500,400,600,300,100],
+                backgroundColor : ['#f56954', '#00a65a', '#f39c12', '#00c0ef', '#3c8dbc', '#d2d6de'],
+              }
+            ]
+          }
+          var donutOptions     = {
+            maintainAspectRatio : false,
+            responsive : true,
+          }
+          //Create pie or douhnut chart
+          // You can switch between pie and douhnut using the method below.
+          new Chart(donutChartCanvas, {
+            type: 'doughnut',
+            data: donutData,
+            options: donutOptions
+          })
+        })
+    </script>
+</body>
+</html>

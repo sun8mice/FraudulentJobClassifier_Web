@@ -1,44 +1,186 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>虚假招聘信息检测信息系统</title>
-    <script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>虚假招聘信息检测信息系统</title>
+  <!-- 引入 AdminLTE 样式文件 -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/adminlte.min.css') }}">
+</head>
+<body class="hold-transition sidebar-mini">
+  <div class="wrapper">
+
+    <!-- 导航栏 -->
+    <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+      <!-- 左侧导航栏链接 -->
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- 侧边栏 -->
+    <aside class="main-sidebar sidebar-dark-primary elevation-4">
+      <!-- 侧边栏品牌LOGO -->
+      <a href="#" class="brand-link">
+        <span class="brand-text font-weight-light">FJCweb</span>
+      </a>
+
+      <!-- 侧边栏菜单 -->
+      <div class="sidebar">
+        <!-- 你的侧边栏内容 -->
+      </div>
+    </aside>
+
+    <!-- Content Wrapper. 包含页面内容 -->
+    <div class="content-wrapper">
+
+      <!-- 主内容区域 -->
+      <section class="content">
+        <div class="container-fluid">
+
+            <div class="row">
+              <div class="col-md-6">
+                <!-- 上传数据部分 -->
+                <div class="box box-primary">
+                  <div class="box-header with-border"> 
+                    <h3 class="box-title">输入数据</h3> 
+                  </div> 
+                  <div class="box-body"> 
+                    <div class="input-group">
+                      <textarea id="input-text" rows="4" class="form-control"></textarea>
+                      <span class="input-group-btn">
+                        <button class="btn btn-primary" onclick="submitData()">提交</button>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <!-- 模型预测结果部分 -->
+                <div class="box box-success">
+                  <div class="box-header with-border">
+                    <h3 class="box-title">模型预测结果</h3>
+                  </div>
+                  <div class="box-body">
+                    <div class="direct-chat">
+                      <div class="direct-chat-messages" id="prediction-result"></div>
+                    </div>
+                  </div>
+                  <div class="box-footer">
+                    <button class="btn btn-danger" onclick="resetData()">重置</button>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="row">
+                  <!-- smallbox组件：记录检测次数 -->
+                  <div class="col-md-6">
+                    <div class="small-box bg-info">
+                      <div class="inner">
+                        <h3 id="detection-count">0</h3>
+                        <p>检测数量</p>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- smallbox组件：记录结果负面率 -->
+                  <div class="col-md-6">
+                    <div class="small-box bg-info">
+                      <div class="inner">
+                        <h3 id="negativity-rate">0%</h3>
+                        <p>虚假招聘信息比例</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+      <!-- /.container-fluid -->
+      </section>
+      <!-- /.content -->
+
+    </div>
+    <!-- /.content-wrapper -->
+
+    <!-- 页脚 -->
+    <footer class="main-footer">
+      <!-- 你的页脚内容 -->
+    </footer>
+  </div>
+  <!-- ./wrapper -->
+
+  <!-- 引入 AdminLTE JavaScript 文件 -->
+  <script src="../static/js/adminlte.js"></script>
+
+  javascript
+  <script>
+        var detectionCount = 0;
         function submitData() {
-            var inputText = document.getElementById("input-text").value;
+            // 获取输入文本
+            var inputData = document.getElementById('input-text').value;
+
+            // 创建 XMLHttpRequest 对象
             var xhr = new XMLHttpRequest();
+
+            // 设置请求方法和请求地址
             xhr.open("POST", "/predict", true);
+
+            // 设置请求头
             xhr.setRequestHeader("Content-Type", "application/json");
+
+            // 监听状态变化
             xhr.onreadystatechange = function() {
                 if (xhr.readyState === 4 && xhr.status === 200) {
+                    // 解析响应数据
                     var response = JSON.parse(xhr.responseText);
-                    document.getElementById("prediction-result").value = response.result;
+
+                    // 获取模型预测结果
+                    var prediction = response.result;
+
+                    // 获取当前时间
+                    var currentTime = new Date().toLocaleTimeString();
+
+                    // 更新预测结果
+                    var predictionResult = document.getElementById('prediction-result');
+
+                    // 添加用户输入消息
+                    predictionResult.innerHTML += '<div class="direct-chat-msg left"><div class="direct-chat-info clearfix"><span class="direct-chat-name float-left">User</span><span class="direct-chat-timestamp float-right">' + currentTime + '</span></div><div class="direct-chat-text">' + inputData + '</div></div>';
+
+                    // 获取服务器回应的实际时间
+                    var serverTime = new Date().toLocaleTimeString();
+
+                    // 添加服务器回应消息
+                    predictionResult.innerHTML += '<div class="direct-chat-msg right"><div class="direct-chat-info clearfix"><span class="direct-chat-name float-right">Server</span><span class="direct-chat-timestamp float-left">' + serverTime + '</span></div><div class="direct-chat-text">' + prediction + '</div></div>';
+                    detectionCount++; // 检测次数加一
+                    updateDetectionCount(); // 更新检测次数显示
                 }
             };
-            var data = JSON.stringify({"text": inputText});
+
+            // 构造请求体数据
+            var data = JSON.stringify({"text": inputData});
+
+            // 发送请求
             xhr.send(data);
         }
-
-        function resetData() {
-        document.getElementById("input-text").value = '';
-        document.getElementById("prediction-result").value = '';
+  
+        // 更新检测次数显示函数
+        function updateDetectionCount() {
+            // 获取 detection-count 元素
+            var detectionCountElement = document.getElementById("detection-count");
+            // 更新其文本内容为当前检测次数
+            detectionCountElement.innerText = detectionCount;
         }
-    </script>
-</head>
-<body>
-    <h1 style="text-align: center;">基于Flask搭建的虚假招聘信息检测信息系统</h1>
-    <div id="upload-section">
-        <h2>上传数据</h2>
-        <textarea id="input-text" rows="4" cols="50"></textarea>
-        <button onclick="submitData()">提交</button>
-    </div>
-    <div id="prediction-section">
-        <h2>模型预测结果</h2>
-        <textarea id="prediction-result" rows="4" cols="50"></textarea>
-        <button onclick="resetData()">重置</button>
-    </div>
-    
-    <div id="visualization-section">
-        <!-- 可视化区块 -->
-    </div>
+      
+      function resetData() {
+          // 清空预测结果
+          document.getElementById('prediction-result').innerHTML = '';
+          // 清空输入框
+          document.getElementById("input-text").value = '';
+          // 将检测次数重置为 0
+          detectionCount = 0;
+          // 更新检测次数显示
+          updateDetectionCount();
+      }
+  </script>
 </body>
 </html>
