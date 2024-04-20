@@ -115,52 +115,55 @@
   javascript
   <script>
         var detectionCount = 0;
+        // 替换文本中的换行符，解决文本内容含html换行符导致导致表单只提交换行符前的内容
+        function replaceNewlines(text) {
+          return text.replace(/\n/g, "<br>");
+        }
+
         function submitData() {
-            // 获取输入文本
-            var inputData = document.getElementById('input-text').value;
+          // 获取输入文本
+          var inputData = document.getElementById('input-text').value;
+          var InputData = replaceNewlines(inputData);
+          
+          // 创建 XMLHttpRequest 对象
+          var xhr = new XMLHttpRequest();
 
-            // 创建 XMLHttpRequest 对象
-            var xhr = new XMLHttpRequest();
+          // 设置请求方法和请求地址
+          xhr.open("POST", "/predict", true);
 
-            // 设置请求方法和请求地址
-            xhr.open("POST", "/predict", true);
+          // 设置请求头
+          xhr.setRequestHeader("Content-Type", "application/json");
 
-            // 设置请求头
-            xhr.setRequestHeader("Content-Type", "application/json");
+          // 监听状态变化
+          xhr.onreadystatechange = function() {
+              if (xhr.readyState === 4 && xhr.status === 200) {
+                  // 解析响应数据
+                  var response = JSON.parse(xhr.responseText);
 
-            // 监听状态变化
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    // 解析响应数据
-                    var response = JSON.parse(xhr.responseText);
+                  // 获取模型预测结果
+                  var prediction = response.result;
 
-                    // 获取模型预测结果
-                    var prediction = response.result;
+                  // 获取当前时间
+                  var currentTime = new Date().toLocaleTimeString();
 
-                    // 获取当前时间
-                    var currentTime = new Date().toLocaleTimeString();
+                  // 更新预测结果
+                  var predictionResult = document.getElementById('prediction-result');
 
-                    // 更新预测结果
-                    var predictionResult = document.getElementById('prediction-result');
+                  // 添加用户输入消息
+                  predictionResult.innerHTML += '<div class="direct-chat-msg left"><div class="direct-chat-info clearfix"><span class="direct-chat-name float-left">User</span><span class="direct-chat-timestamp float-right">' + currentTime + '</span></div><div class="direct-chat-text">' + inputData + '</div></div>';
 
-                    // 添加用户输入消息
-                    predictionResult.innerHTML += '<div class="direct-chat-msg left"><div class="direct-chat-info clearfix"><span class="direct-chat-name float-left">User</span><span class="direct-chat-timestamp float-right">' + currentTime + '</span></div><div class="direct-chat-text">' + inputData + '</div></div>';
+                  // 获取服务器回应的实际时间
+                  var serverTime = new Date().toLocaleTimeString();
 
-                    // 获取服务器回应的实际时间
-                    var serverTime = new Date().toLocaleTimeString();
+                  // 添加服务器回应消息
+                  predictionResult.innerHTML += '<div class="direct-chat-msg right"><div class="direct-chat-info clearfix"><span class="direct-chat-name float-right">Server</span><span class="direct-chat-timestamp float-left">' + serverTime + '</span></div><div class="direct-chat-text">' + prediction + '</div></div>';
+                  detectionCount++; // 检测次数加一
+                  updateDetectionCount(); // 更新检测次数显示
+              }
+          };
 
-                    // 添加服务器回应消息
-                    predictionResult.innerHTML += '<div class="direct-chat-msg right"><div class="direct-chat-info clearfix"><span class="direct-chat-name float-right">Server</span><span class="direct-chat-timestamp float-left">' + serverTime + '</span></div><div class="direct-chat-text">' + prediction + '</div></div>';
-                    detectionCount++; // 检测次数加一
-                    updateDetectionCount(); // 更新检测次数显示
-                }
-            };
-
-            // 构造请求体数据
-            var data = JSON.stringify({"text": inputData});
-
-            // 发送请求
-            xhr.send(data);
+          // 发送编码后的数据
+          xhr.send(JSON.stringify({ 'text': InputData }));
         }
   
         // 更新检测次数显示函数
