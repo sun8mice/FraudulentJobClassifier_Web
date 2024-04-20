@@ -16,9 +16,7 @@ import pandas as pd
 import requests
 import hashlib
 import random
-# 逐行处理HTML文本
 from bs4 import BeautifulSoup
-
 
 # 英文文本预处理
 def preprocess_text(text):
@@ -38,6 +36,22 @@ def preprocess_text(text):
     processed_text = ' '.join(words)
     return processed_text
 
+# 中文文本预处理
+def chinese_text_preprocess(text):
+    # 去除标点符号
+    text = re.sub(r'[^\w\s]', '', text)
+    
+    # 去除特殊符号
+    text = re.sub(r'[\(\)（）【】《》“”‘’\'\"\'\s]', '', text)
+    
+    # 加载中文停用词表
+    chinese_stopwords = set(stopwords.words('chinese'))
+    
+    # 去除停用词
+    text = ' '.join([word for word in text.split() if word not in chinese_stopwords])
+    
+    return text
+
 #html文本预处理
 def html_process(text) :
     # 使用BeautifulSoup解析HTML文本
@@ -45,6 +59,31 @@ def html_process(text) :
     # 获取纯文本内容
     plain_text = soup.get_text(strip=True)
     return plain_text
+
+def get_stacking_model():  # 获取Stacking模型
+    model_path = 'static/model/stacking_model.pkl'
+    model = joblib.load(model_path)
+    return model
+
+def get_vectorizer():  # 获取向量化器
+    vectorizer_path = 'static/vectorizer/tfidfvectorizer.pkl'
+    vectorizer = joblib.load(vectorizer_path)
+    return vectorizer
+
+def predict_text(text):
+    # 加载模型和向量化器
+    stacking_model = get_stacking_model()
+    vectorizer = get_vectorizer()
+    
+    # 将文本向量化
+    text_vectorized = vectorizer.transform([text])
+    
+    # 进行预测
+    prediction = stacking_model.predict(text_vectorized)
+    
+    result = check_result(prediction)
+
+    return result
 
 # 调用百度api进行翻译
 def translate_CH2EN(text):  
@@ -139,9 +178,4 @@ def datasetprocess(data) :
     data['text'] =   data['text'].apply(html_process)
     data['text'] = data['text'].apply(preprocess_text)
 
-
     return data
-
-# text = "Here is an example sentence, with some punctuation! It also contains numbers like 123."
-# processed_text = preprocess_text(text)
-# print(processed_text)

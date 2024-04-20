@@ -52,15 +52,30 @@ def preprocess_text(text):
     processed_text = ' '.join(words)
     return processed_text
 
-def get_pymodel():  #获取模型
-    model_path = 'static/model/gbt_model.pkl'
+def get_stacking_model():  # 获取Stacking模型
+    model_path = 'static/model/stacking_model.pkl'
     model = joblib.load(model_path)
     return model
 
-def get_vectorizer():  #获取向量化器
-    model_path = 'static/vectorizer/tfidf_vectorizer.pkl'
-    model = joblib.load(model_path)
-    return model
+def get_vectorizer():  # 获取向量化器
+    vectorizer_path = 'static/vectorizer/tfidfvectorizer'
+    vectorizer = joblib.load(vectorizer_path)
+    return vectorizer
+
+def predict_text(text):
+    # 加载模型和向量化器
+    stacking_model = get_stacking_model()
+    vectorizer = get_vectorizer()
+    
+    # 将文本向量化
+    text_vectorized = vectorizer.transform([text])
+    
+    # 进行预测
+    prediction = stacking_model.predict(text_vectorized)
+    
+    result = check_result(prediction)
+
+    return result
 
 def check_senti(prediction_result):
         # 将预测结果转换为列表
